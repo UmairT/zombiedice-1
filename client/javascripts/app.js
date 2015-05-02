@@ -3,11 +3,13 @@ function logon() {
 	pw1 = $("#loginarea #password").val();
 	info = {"username":username, "password":pw1};
 	
-	console.log(info);
-	
 	$.post("/userlogin", info, function(response) {
 		if (response.logon) {
+			$("#wrongunpw").hide();
 			$(location).attr('href', "lobby.html");
+		} else {
+			console.log("wrong username/password");
+			$("#wrongunpw").show();
 		}
 	});
 }
