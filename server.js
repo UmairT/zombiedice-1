@@ -23,12 +23,12 @@ var express = require("express"),
 
 var	socketIO = require('socket.io'),
 	io = socketIO(server),
-	myJson = '{}';
+	nspLobby = io.of('/lobby'),
+	nspGame = io.of('/ingame');
 
 var sess;
-var clients = [];
-	
-io.adapter(redisstore(process.env.REDISTOGO_URL));
+var lobbyclients = [];
+var gameclients = [];
 
 console.log("Server is listening at http://localhost:3000/");
 
@@ -93,17 +93,14 @@ var login = function(collection, obj, req, res) {
 		if(!err) {
 			if (item !== null) {
 				if (obj.password === item.password) {
-					console.log("password match");
 					sess=req.session;
 					sess.username=obj.username;
 					res.json({"logon":true});
 				}
 				else {
-					console.log("password not match");
 					res.json({"logon":false});
 				}
 			} else {
-				console.log("username not match");
 				res.json({"logon":false});
 			}			
 		}			
@@ -148,7 +145,21 @@ app.get("/logoff",function(req,res) {
 app.get('/getrecord', function(req, res) {
 	sess=req.session;
 	connectDB(record, sess, req, res);
-	
+});
+
+app.get('/game', function(req, res) {
+	sess = req.session;
+	res.redirect("/gameboard.html");
+});
+
+app.get('/lobby', function(req, res) {
+	console.log("returning to lobby");
+	sess = req.session;
+	if (sess.username) {
+		res.redirect("/lobby.html");
+	} else {
+		res.redirect("/index.html");
+	}
 });
 
 app.post("/registration", function (req,res) {
@@ -169,43 +180,56 @@ app.post("/userlogin", function (req,res) {
 });
 
 //socket io interaction
-io.on('connection', function(socket) {
-	console.log(sess.username + ' connected');
+//io.on('connection', function(socket) {
+nspLobby.on('connection', function(socket) {
+	console.log(sess.username + ' connected to lobby');
 	
 	//get display of current users in lobby
-	io.sockets.connected[socket.id].emit('current lobby', clients);
+	//io.sockets.connected[socket.id].emit('current lobby', clients);
+	nspLobby.connected[socket.id].emit('current lobby', lobbyclients);
 	
 	//add new user to clients
-	clients.push({sid: socket.id, username: sess.username});
+	lobbyclients.push({sid: socket.id, username: sess.username});
 	
 	//lets other users know someone has joined lobby
 	socket.broadcast.emit('user join', sess.username, socket.id);
 	
 	//let other players know someone left
 	socket.on('disconnect', function () {
-		var index = findIndex(clients, "sid", socket.id);
-		clients.splice(index, 1);
+		var index = findIndex(lobbyclients, "sid", socket.id);
+		console.log(lobbyclients[index].username + ' left lobby');
+		lobbyclients.splice(index, 1);
 		socket.broadcast.emit('user left', socket.id);
-		console.log('user disconnected');
 	});
 	
 	//send challenge request
 	socket.on('challenge', function(sid) {
 		console.log("recieved challenge for " + sid);
-		var index = findIndex(clients, "sid", socket.id);
-		io.sockets.connected[sid].emit("challenge recieved", clients[index].username, socket.id);
+		var index = findIndex(lobbyclients, "sid", socket.id);
+		nspLobby.connected[sid].emit("challenge recieved", lobbyclients[index].username, socket.id);
 	});
 	
 	//send decline
 	socket.on('declined', function(sid) {
 		console.log(sid + " declined challenge");
-		io.sockets.connected[sid].emit("challenge declined");
+		nspLobby.connected[sid].emit("challenge declined");
 	});
 	
-		//send decline
+	//send decline
 	socket.on('accepted', function(sid) {
 		console.log(sid + " accepted challenge");
-		io.sockets.connected[sid].emit("challenge accepted", socket.id);
+		nspLobby.connected[sid].emit("challenge accepted", socket.id);
 	});
 
+});
+
+//game io interaction
+nspGame.on ('connection', function(socket) {
+	console.log(sess.username + ' joined game');
+	console.log(sess);
+	
+	socket.on('disconnect', function () {
+		console.log('someone disconnected');
+		
+	});
 });

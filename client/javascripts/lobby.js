@@ -1,14 +1,10 @@
 var socket;
 
-function challengePlayer(sid) {
-	console.log("inside challenge: " + sid);
-	//socket.emit("challenge", sid);
-}
-
 var main = function() {
 	"use strict";
 	
-	socket = io();
+	//socket = io();
+	socket = io('http://localhost:3000/lobby');
 	
 	//Get user win/loss record
 	$.getJSON("/getrecord", function (response) {
@@ -30,12 +26,6 @@ var main = function() {
 			}
 		});
 	});
-	
-	//Challenge prompt
-	//$("#testbutton").click(function() {
-	//	$("#challengepopup").show();
-		//$("#fade").show();
-	//});
 	
 	//Send challenge
 	$("#btnChallenge").click(function() {
@@ -63,6 +53,8 @@ var main = function() {
 		$("#challengepopup").hide();
 		console.log("Challengers sid: " + sid);
 		socket.emit("accepted", sid);
+		//$(location).attr('href', "gameboard.html");
+		$(location).attr('href', "/game");
 	});
 	
 	//Close declined popup
