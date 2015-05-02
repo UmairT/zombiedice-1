@@ -26,8 +26,12 @@ var main = function() {
 	
 	//update available players area
 	socket.on('user join', function(username, id) {
+		var $messageUser;
 		console.log("Add: " + id);
-		$("#onlineplayers").append($("<li id= '" + id + "'>").text(username + " is in the lobby."));
+		
+		$messageUser = $("<li id= '" + id + "'>").text(username + " is in the lobby.");
+		$messageUser.append($("<button class='players' id=plyr" + id + "' onclick='#'>").text("Challenge"));
+		$("#onlineplayers").append($messageUser);
 	});
 	
 	socket.on('user left', function(id) {
@@ -36,9 +40,12 @@ var main = function() {
 	});
 	
 	socket.on('current lobby', function(clients) {
-		console.log("current lobby");
+		var $messageUser;
 		for (var i in clients) {
-			$("#onlineplayers").append($('<li>').text(clients[i].username + " is in the lobby."));
+			$messageUser = $("<li id= '" + clients[i].sid + "'>").text(clients[i].username + " is in the lobby.");
+			$messageUser.append($("<button class='players' id=plyr" + clients[i].sid + "' onclick='#'>").text("Challenge"));
+			$("#onlineplayers").append($messageUser);
+			//$("#onlineplayers").append($('<li>').text(clients[i].username + " is in the lobby."));
 		}
 	});
 };
