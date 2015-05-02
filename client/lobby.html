@@ -81,21 +81,34 @@
     </div>
     </div>
     
-        <div id="available">
-	<!--<ul id="onlineplayers"></ul>-->
+<div id="available">
 	<select id="onlineplayers" size=28></select>
 	<button id="btnChallenge">Challenge</button>
-	<button id="testbutton">Test</button>
-    </div>
+	<!--<button id="testbutton">Test</button>-->
+</div>
 
-<div id="challengepopup" class="white_content">
+<div id="challengepopup" class="popups">
 	<form action="#" id="form" method="post" name="form">
 		<h2>Your have been challenged by <div id="challenger">player</div></h2>
+		<input type="hidden" id="challengeid" value="">
 		<button type="button" class="formbutton" id="chAccept">Accept</button>
 		<button type="button" class="formbutton" id="chDecline">Decline</button><br>
 	<form>
 </div>
-    </container>
+
+<div id="waitingpopup" class="popups">
+	<form action="#" id="form" method="post" name="form">
+		<h2>Awaiting reply</h2>
+	<form>
+</div>
+
+<div id="declinedpopup" class="popups">
+	<form action="#" id="form" method="post" name="form">
+		<h2>Your challenge has been declined.</h2>
+		<button type="button" class="formbutton" id="btnDeclineClose">Close</button><br>
+	<form>
+</div>
+</container>
     
 
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>

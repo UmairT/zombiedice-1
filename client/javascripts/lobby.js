@@ -32,24 +32,17 @@ var main = function() {
 	});
 	
 	//Challenge prompt
-	$("#testbutton").click(function() {
-		$("#challengepopup").show();
-		$("#fade").show();
-	});
+	//$("#testbutton").click(function() {
+	//	$("#challengepopup").show();
+		//$("#fade").show();
+	//});
 	
-	$("#challengepopup #chDecline").click(function() {
-		$("#challengepopup").hide();
-		$("#fade").hide();
-	});
-	
-	$("challengepopup #chAccept").click(function() {
-		
-	});
-	
+	//Send challenge
 	$("#btnChallenge").click(function() {
 		console.log("challenge button clicked");
 		var sid = $("#onlineplayers").val();
 		if (sid !== null) {
+			$("#waitingpopup").show();
 			socket.emit("challenge", sid);
 			console.log("Challenge sent to :" + sid);
 		} else {
@@ -57,13 +50,35 @@ var main = function() {
 		}
 	});
 	
+	//Decline challenge
+	$("#challengepopup #chDecline").click(function() {
+		var sid = $("#challengepopup #challengeid").val();
+		$("#challengepopup").hide();
+		socket.emit("declined", sid);
+	});
+	
+	//Accept challenge
+	$("#challengepopup #chAccept").click(function() {
+		var sid = $("#challengepopup #challengeid").val();
+		$("#challengepopup").hide();
+		console.log("Challengers sid: " + sid);
+		socket.emit("accepted", sid);
+	});
+	
+	//Close declined popup
+	$("#btnDeclineClose").click(function() {
+		$("#declinedpopup").hide();
+	});
+	
 	//update available players area
+	//player joins
 	socket.on('user join', function(username, id) {
 		var $messageUser;
 		$messageUser = $("<option id= '" + id + "' value= '" + id + "'>").text(username + " is in the lobby.");
 		$("#onlineplayers").append($messageUser);
 	});
 	
+	//player leaves
 	socket.on('user left', function(id) {
 		console.log("Remove: " + "#" + id);
 		$("#" + id).remove();
@@ -78,8 +93,27 @@ var main = function() {
 		}
 	});
 	
+	//recieve a challenge request
 	socket.on('challenge recieved', function(username, sid) {
 		console.log("challenged recieved by " + username + " at " + sid);
+		$("#challengepopup").show();
+		$("#fade").show();
+		$("#challengepopup #challenger").empty();
+		$("#challengepopup #challenger").append(username);
+		$("#challengepopup #challengeid").val(sid);
+	});
+	
+	//recieve decline
+	socket.on('challenge declined', function() {
+		console.log("challenge declined");
+		$("#waitingpopup").hide();
+		$("#declinedpopup").show();
+	});
+	
+	//recieve accept
+	socket.on('challenge accepted', function(sid) {
+		console.log("challenge accepted by " + sid);
+		$("#waitingpopup").hide();
 	});
 };
 

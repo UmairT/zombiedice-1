@@ -195,5 +195,17 @@ io.on('connection', function(socket) {
 		var index = findIndex(clients, "sid", socket.id);
 		io.sockets.connected[sid].emit("challenge recieved", clients[index].username, socket.id);
 	});
+	
+	//send decline
+	socket.on('declined', function(sid) {
+		console.log(sid + " declined challenge");
+		io.sockets.connected[sid].emit("challenge declined");
+	});
+	
+		//send decline
+	socket.on('accepted', function(sid) {
+		console.log(sid + " accepted challenge");
+		io.sockets.connected[sid].emit("challenge accepted", socket.id);
+	});
 
 });
