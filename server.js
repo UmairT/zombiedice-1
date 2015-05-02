@@ -181,6 +181,7 @@ io.on('connection', function(socket) {
 	//lets other users know someone has joined lobby
 	socket.broadcast.emit('user join', sess.username, socket.id);
 	
+	//let other players know someone left
 	socket.on('disconnect', function () {
 		var index = findIndex(clients, "sid", socket.id);
 		clients.splice(index, 1);
@@ -188,9 +189,11 @@ io.on('connection', function(socket) {
 		console.log('user disconnected');
 	});
 	
+	//send challenge request
 	socket.on('challenge', function(sid) {
-		console.log("recieved challenge");
-		console.log("send to: " + sid);
+		console.log("recieved challenge for " + sid);
+		var index = findIndex(clients, "sid", socket.id);
+		io.sockets.connected[sid].emit("challenge recieved", clients[index].username, socket.id);
 	});
 
 });

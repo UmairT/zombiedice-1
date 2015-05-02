@@ -324,6 +324,10 @@ header, container {
 	float: left;
 	min-width: 200px;
 }
+
+#onlineplayers {
+	width: 100%;
+}
 #userinfo {
 	width: 48%;
 	height: 500px;

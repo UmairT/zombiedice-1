@@ -46,14 +46,21 @@ var main = function() {
 		
 	});
 	
+	$("#btnChallenge").click(function() {
+		console.log("challenge button clicked");
+		var sid = $("#onlineplayers").val();
+		if (sid !== null) {
+			socket.emit("challenge", sid);
+			console.log("Challenge sent to :" + sid);
+		} else {
+			console.log ("nothing selected");
+		}
+	});
+	
 	//update available players area
 	socket.on('user join', function(username, id) {
 		var $messageUser;
-		console.log("Add: " + id);
-		
-		$messageUser = $("<li id= '" + id + "'>").text(username + " is in the lobby.");
-		//$messageUser.append($("<button class= 'players' id= 'plyr" + id + "' onclick='challengePlayer(" + String(id) + ")'>").text("Challenge"));
-		$messageUser.append($("<button onclick='" + socket.emit('challenge', id) + "'>").text("Challenge"));
+		$messageUser = $("<option id= '" + id + "' value= '" + id + "'>").text(username + " is in the lobby.");
 		$("#onlineplayers").append($messageUser);
 	});
 	
@@ -66,11 +73,13 @@ var main = function() {
 	socket.on('current lobby', function(clients) {
 		var $messageUser;
 		for (var i in clients) {
-			$messageUser = $("<li id= '" + clients[i].sid + "'>").text(clients[i].username + " is in the lobby.");
-			//$messageUser.append($("<button class='players' id='plyr" + clients[i].sid + "' onclick='challengePlayer(" + String(clients[i].sid) + ")'>").text("Challenge"));
-			$messageUser.append($("<button onclick='" + socket.emit('challenge', clients[i].sid) +"'>").text("Challenge"));
+			$messageUser = $("<option id= '" + clients[i].sid + "' value= '" + clients[i].sid + "'>").text(clients[i].username + " is in the lobby.");
 			$("#onlineplayers").append($messageUser);
 		}
+	});
+	
+	socket.on('challenge recieved', function(username, sid) {
+		console.log("challenged recieved by " + username + " at " + sid);
 	});
 };
 
