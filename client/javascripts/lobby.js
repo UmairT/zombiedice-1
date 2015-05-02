@@ -1,7 +1,14 @@
+var socket;
+
+function challengePlayer(sid) {
+	console.log("inside challenge: " + sid);
+	//socket.emit("challenge", sid);
+}
+
 var main = function() {
 	"use strict";
 	
-	var socket = io();
+	socket = io();
 	
 	//Get user win/loss record
 	$.getJSON("/getrecord", function (response) {
@@ -25,9 +32,18 @@ var main = function() {
 	});
 	
 	//Challenge prompt
+	$("#testbutton").click(function() {
+		$("#challengepopup").show();
+		$("#fade").show();
+	});
+	
 	$("#challengepopup #chDecline").click(function() {
 		$("#challengepopup").hide();
 		$("#fade").hide();
+	});
+	
+	$("challengepopup #chAccept").click(function() {
+		
 	});
 	
 	//update available players area
@@ -36,7 +52,8 @@ var main = function() {
 		console.log("Add: " + id);
 		
 		$messageUser = $("<li id= '" + id + "'>").text(username + " is in the lobby.");
-		$messageUser.append($("<button class='players' id=plyr" + id + "' onclick='#'>").text("Challenge"));
+		//$messageUser.append($("<button class= 'players' id= 'plyr" + id + "' onclick='challengePlayer(" + String(id) + ")'>").text("Challenge"));
+		$messageUser.append($("<button onclick='" + socket.emit('challenge', id) + "'>").text("Challenge"));
 		$("#onlineplayers").append($messageUser);
 	});
 	
@@ -44,13 +61,14 @@ var main = function() {
 		console.log("Remove: " + "#" + id);
 		$("#" + id).remove();
 	});
-	
+
 	//show the current available players
 	socket.on('current lobby', function(clients) {
 		var $messageUser;
 		for (var i in clients) {
 			$messageUser = $("<li id= '" + clients[i].sid + "'>").text(clients[i].username + " is in the lobby.");
-			$messageUser.append($("<button class='players' id=plyr" + clients[i].sid + "' onclick='#'>").text("Challenge"));
+			//$messageUser.append($("<button class='players' id='plyr" + clients[i].sid + "' onclick='challengePlayer(" + String(clients[i].sid) + ")'>").text("Challenge"));
+			$messageUser.append($("<button onclick='" + socket.emit('challenge', clients[i].sid) +"'>").text("Challenge"));
 			$("#onlineplayers").append($messageUser);
 		}
 	});

@@ -188,5 +188,9 @@ io.on('connection', function(socket) {
 		console.log('user disconnected');
 	});
 	
+	socket.on('challenge', function(sid) {
+		console.log("recieved challenge");
+		console.log("send to: " + sid);
+	});
 
 });
