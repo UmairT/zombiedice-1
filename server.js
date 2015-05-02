@@ -170,29 +170,21 @@ app.post("/userlogin", function (req,res) {
 
 //socket io interaction
 io.on('connection', function(socket) {
-	console.log('a user connected');
+	console.log(sess.username + ' connected');
+	
+	//get display of current users in lobby
+	io.sockets.connected[socket.id].emit('current lobby', clients);
+	
+	//add new user to clients
 	clients.push({sid: socket.id, username: sess.username});
 	
 	//lets other users know someone has joined lobby
-	socket.broadcast.emit('user join', sess.username);
-	
-	for (var i in clients) {
-		console.log(clients[i]);
-	}
-	
-	//gets names of others in lobby
-	//socket.broadcast.emit('in lobby', socket.id);
-	
-	
-	socket.on('current lobby', function (id) {
-		console.log("inside current lobby: " + sess.username);
-		socket.broadcast.to(id).emit('user join', sess.username);
-	});
-	
+	socket.broadcast.emit('user join', sess.username, socket.id);
 	
 	socket.on('disconnect', function () {
 		var index = findIndex(clients, "sid", socket.id);
 		clients.splice(index, 1);
+		socket.broadcast.emit('user left', socket.id);
 		console.log('user disconnected');
 	});
 	

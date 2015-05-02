@@ -1,9 +1,7 @@
 var main = function() {
-	"use strict"
+	"use strict";
 	
 	var socket = io();
-	
-	console.log("javascript running");
 	
 	//Get user win/loss record
 	$.getJSON("/getrecord", function (response) {
@@ -15,8 +13,6 @@ var main = function() {
 		
 		$("#losses").empty();
 		$("#losses").append(response.losses);
-		
-		console.log(response);
 	});
 	
 	//Login
@@ -29,13 +25,21 @@ var main = function() {
 	});
 	
 	//update available players area
-	socket.on('user join', function(username) {
-		console.log("player joined");
-		$("#onlineplayers").append($('<li>').text(username + " is in the lobby."));
+	socket.on('user join', function(username, id) {
+		console.log("Add: " + id);
+		$("#onlineplayers").append($("<li id= '" + id + "'>").text(username + " is in the lobby."));
 	});
 	
-	socket.on('in lobby', function(socketid) {
-		socket.emit("current lobby", socketid);
+	socket.on('user left', function(id) {
+		console.log("Remove: " + "#" + id);
+		$("#" + id).remove();
+	});
+	
+	socket.on('current lobby', function(clients) {
+		console.log("current lobby");
+		for (var i in clients) {
+			$("#onlineplayers").append($('<li>').text(clients[i].username + " is in the lobby."));
+		}
 	});
 };
 
