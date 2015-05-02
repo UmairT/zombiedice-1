@@ -24,6 +24,12 @@ var main = function() {
 		});
 	});
 	
+	//Challenge prompt
+	$("#challengepopup #chDecline").click(function() {
+		$("#challengepopup").hide();
+		$("#fade").hide();
+	});
+	
 	//update available players area
 	socket.on('user join', function(username, id) {
 		var $messageUser;
@@ -39,13 +45,13 @@ var main = function() {
 		$("#" + id).remove();
 	});
 	
+	//show the current available players
 	socket.on('current lobby', function(clients) {
 		var $messageUser;
 		for (var i in clients) {
 			$messageUser = $("<li id= '" + clients[i].sid + "'>").text(clients[i].username + " is in the lobby.");
 			$messageUser.append($("<button class='players' id=plyr" + clients[i].sid + "' onclick='#'>").text("Challenge"));
 			$("#onlineplayers").append($messageUser);
-			//$("#onlineplayers").append($('<li>').text(clients[i].username + " is in the lobby."));
 		}
 	});
 };
