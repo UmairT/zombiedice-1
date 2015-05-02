@@ -290,6 +290,12 @@ header, container {
 	border-style: solid;
 	border-width: 1px;
 }
+
+#wrongunpw {
+	display: none;
+	color: #FF0000;
+	font-weight: bold;
+}
 #homepageimage {
 	float: left;
 	width: 100%;
