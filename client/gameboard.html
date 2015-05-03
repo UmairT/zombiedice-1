@@ -17,6 +17,53 @@
 	<container>
 	<h3>Playing against<div id="opponentname">player</div></h3>
 	<input type="hidden" id="opponentid" value="">
+
+
+	<center>
+        <form action="#" method="post" name="form_name" id="form_id" class="form_class" >
+            <input class="btn" type="button" name="roll_id" id="roll" value="Roll" onclick="roll()"/>
+            <input class="btn" type="button" name="stop_id" id="stop" value="Stop and Score" onclick="stop()"/>
+        </form>
+        <br>
+    </center>
+	<div class="DiceTable" >
+            <table >
+                <tr>
+                    <td>
+                        <div class="dice1"></div>
+                    </td>
+                    <td >
+                        <div class="dice2"></div>
+                    </td>
+                    <td >
+                        <div class="dice3"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td >
+                        <div class="dice1_label"></div>
+                    </td>
+                    <td>
+                        <div class="dice2_label"></div>
+                    </td>
+                    <td >
+                        <div class="dice3_label"></div>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>
+                        <div class="turn"></div>
+                        <br>
+                        <div class="brains"></div>
+                        <br>
+                        <div class="shotguns"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
 	<button type="button" id="lobbyreturn">Return To Lobby</button>
 
 	</container>

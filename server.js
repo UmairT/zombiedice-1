@@ -222,6 +222,10 @@ nspLobby.on('connection', function(socket) {
 //game io interaction
 nspGame.on ('connection', function(socket) {
 	console.log(sess.username + ' joined game');
+	var p1Brains = 0,
+		p2Brains = 0,
+		currentPlayer,
+		dice1, dice2, dice3;
 	
 	//add new user to clients
 	gameclients.push({sid: socket.id, username: sess.username});
@@ -243,6 +247,13 @@ nspGame.on ('connection', function(socket) {
 		var index = findIndex(gameclients, "sid", socket.id);
 		var username = gameclients[index].username;
 		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
+	});
+
+	socket.on('stop and score', function(sid) {
+		console.log("score saved");
+		var index = findIndex(gameclients, "sid", socket.id);
+		var username = gameclients[index].username;
+		nspGame.connected[sid].emit("stop", socket.id, username, 1);
 	});
 	
 	socket.on('disconnect', function () {
