@@ -117,10 +117,6 @@ var record = function(collection, obj, req, res) {
 };
 
 //routing
-app.get("/results", function (req, res) {
-	//res.json(myJson);
-});
-
 app.get("/",function(req,res){
 	console.log("inside /");
 	sess=req.session;
@@ -147,8 +143,17 @@ app.get('/getrecord', function(req, res) {
 	connectDB(record, sess, req, res);
 });
 
-app.get('/game', function(req, res) {
+app.get('/startgame/*', function(req, res) {
 	sess = req.session;
+	sess.opponentlobbyid = req.param(0);
+	sess.opponentgameid = null;
+	res.redirect("/gameboard.html");
+});
+
+app.get('/joingame/*', function(req, res) {
+	sess = req.session;
+	sess.opponentlobbyid = null;
+	sess.opponentgameid = req.param(0);
 	res.redirect("/gameboard.html");
 });
 
@@ -179,13 +184,11 @@ app.post("/userlogin", function (req,res) {
 	connectDB(login, userinfo, req, res);
 });
 
-//socket io interaction
-//io.on('connection', function(socket) {
+//lobby socket io interaction
 nspLobby.on('connection', function(socket) {
 	console.log(sess.username + ' connected to lobby');
 	
 	//get display of current users in lobby
-	//io.sockets.connected[socket.id].emit('current lobby', clients);
 	nspLobby.connected[socket.id].emit('current lobby', lobbyclients);
 	
 	//add new user to clients
@@ -214,22 +217,35 @@ nspLobby.on('connection', function(socket) {
 		console.log(sid + " declined challenge");
 		nspLobby.connected[sid].emit("challenge declined");
 	});
-	
-	//send decline
-	socket.on('accepted', function(sid) {
-		console.log(sid + " accepted challenge");
-		nspLobby.connected[sid].emit("challenge accepted", socket.id);
-	});
-
 });
 
 //game io interaction
 nspGame.on ('connection', function(socket) {
 	console.log(sess.username + ' joined game');
-	console.log(sess);
+	
+	//add new user to clients
+	gameclients.push({sid: socket.id, username: sess.username});
+	
+	if (sess.opponentlobbyid !== null) {
+		console.log("Calling other player");
+		//call opponent to game
+		nspLobby.connected[sess.opponentlobbyid].emit('pull to game', socket.id);
+	} else {
+		console.log("Other player has arrived");
+		//make connection to other player
+		var opponentid = sess.opponentgameid;
+		var username = sess.username;
+		nspGame.connected[opponentid].emit('handshake', socket.id, username, 0);
+	}
+	
+	socket.on('return handshake', function(sid) {
+		console.log("handshake returned");
+		var index = findIndex(gameclients, "sid", socket.id);
+		var username = gameclients[index].username;
+		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
+	});
 	
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
-		
 	});
 });

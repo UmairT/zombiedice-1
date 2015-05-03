@@ -52,9 +52,8 @@ var main = function() {
 		var sid = $("#challengepopup #challengeid").val();
 		$("#challengepopup").hide();
 		console.log("Challengers sid: " + sid);
-		socket.emit("accepted", sid);
-		//$(location).attr('href', "gameboard.html");
-		$(location).attr('href', "/game");
+		//socket.emit("accepted", sid);
+		$(location).attr('href', "/startgame/" + sid);
 	});
 	
 	//Close declined popup
@@ -106,6 +105,13 @@ var main = function() {
 	socket.on('challenge accepted', function(sid) {
 		console.log("challenge accepted by " + sid);
 		$("#waitingpopup").hide();
+		//$(location).attr('href', "/game/" + sid);
+	});
+	
+	//pull to game
+	socket.on('pull to game', function(sid) {
+		console.log("game sid: " + sid);
+		$(location).attr('href', "/joingame/" + sid);
 	});
 };
 
