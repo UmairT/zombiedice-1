@@ -17,7 +17,7 @@ var express = require("express"),
 		secret: '1029384756',
 		resave: false,
 		saveUninitialized: true,
-		cookie: { maxAge: 60000 }
+		cookie: { maxAge: 3600000 }
 	})); 
 	
 
