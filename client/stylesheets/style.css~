@@ -317,6 +317,8 @@ header, container {
     padding: 16px;
     border: 16px black;
     background-image: url("background.jpg");
+	background-size: cover;
+	background-size: 100% 100%;
     z-index:1002;
     overflow: auto;
 }
@@ -330,7 +332,9 @@ header, container {
     height: 25%;
     padding: 16px;
     border: 16px solid black;
-    background-color: #855C33;
+    background-image: url("background.jpg");
+	background-size: cover;
+	background-size: 100% 100%;
     z-index:1002;
     overflow: auto;
 }
@@ -375,8 +379,7 @@ header, container {
 	display: none;
 }
 
-#available {
-	
+#available {	
 	width: 50%;
 	height: 500px;
 	border-style: solid;
