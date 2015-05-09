@@ -53,7 +53,6 @@ var main = function() {
 	});
 
 	socket.on('handshake', function(sid, username, ret) {
-		playersid = sid;
 		console.log("handshake received from " + sid);
 		$("#opponentid").val(sid);
 		$("#opponentname").empty();
@@ -92,19 +91,3 @@ var main = function() {
 }
 
 $(document).ready(main);
-
-// function roll () {
-    
-// };
-
-// function stop () {
-// 	socket.on('stop', function(sid, username, ret) {
-		
-// 		var brains = 5;
-// 		$("div.brains").text("Brains: " + brains);
-
-// 		if (ret === 0) {
-// 			socket.emit("stop and score", sid, brains);
-// 		}
-// 	});
-// };

@@ -260,7 +260,7 @@ function checkDice(firstDice, secondDice, thirdDice) {
 ///////////////////////////////////////////////////
 
 
-
+var human;
 
 //lobby socket io interaction
 nspLobby.on('connection', function(socket) {
@@ -285,6 +285,7 @@ nspLobby.on('connection', function(socket) {
 	
 	//send challenge request
 	socket.on('challenge', function(sid) {
+		human = sid;
 		console.log("recieved challenge for " + sid);
 		var index = findIndex(lobbyclients, "sid", socket.id);
 		nspLobby.connected[sid].emit("challenge recieved", lobbyclients[index].username, socket.id);
@@ -302,7 +303,7 @@ nspGame.on ('connection', function(socket) {
 	console.log(sess.username + ' joined game');
 	var p1Brains = 0,
 		p2Brains = 0,
-		currentPlayer,
+		zombie,
 		dice1, dice2, dice3;
 	
 	//add new user to clients
@@ -318,13 +319,33 @@ nspGame.on ('connection', function(socket) {
 		var opponentid = sess.opponentgameid;
 		var username = sess.username;
 		nspGame.connected[opponentid].emit('handshake', socket.id, username, 0);
+
+		//testing is the person that was challenged? zombie challenge human -> opponentid is human!
+		nspGame.emit('Player', socket.id, username);
+		console.log('opponentid ' + opponentid);
+		nspGame.connected[opponentid].emit('disable', socket.id);
+
 	}
 	
+
+
+	///changed the bottom half of this functions
 	socket.on('return handshake', function(sid) {
+		//testing for disable  zombie hmmmm
+		//nspGame.connected[human].emit('disable', sid);  
+		zombie = sid;
+
+		console.log('Human ' + human);
+		console.log('Zombie ' + zombie);
 		console.log("handshake returned");
 		var index = findIndex(gameclients, "sid", socket.id);
 		var username = gameclients[index].username;
 		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
+
+		///testing challenge player goes first
+		//nspGame.emit('Player', sid, username);
+		//nspGame.connected[sid].emit('Player', sid, username);
+		//nspGame.connected[sid].emit('disable', sid);
 	});
 
 
