@@ -324,14 +324,14 @@ header, container {
 }
 
 .popups {
-    display: none;
+    /*display: none;*/
     position: absolute;
-    top: 25%;
-    left: 25%;
-    width: 25%;
-    height: 25%;
+    top: 75%;
+    left: 10%;
+    width: 30%;
+    height: 40%;
     padding: 16px;
-    border: 16px solid black;
+    border: 1px solid black;
     background-image: url("background.jpg");
 	background-size: cover;
 	background-size: 100% 100%;
@@ -382,8 +382,6 @@ header, container {
 #available {	
 	width: 50%;
 	height: 500px;
-	border-style: solid;
-	border-width: 1px;
 	border-color: #000000;
 	float: left;
 	min-width: 200px;

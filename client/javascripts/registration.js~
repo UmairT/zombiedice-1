@@ -12,8 +12,8 @@ function newRegistration() {
 		alert("Username cannot be empty");
 	} else if (pw1 === "" || pw2 === "") {
 		alert("Password cannot be empty");
-	} else if (!email.match(format)) {
-		alert("Please enter your email correctly");
+	} else if (email === "") {
+		alert("Email cannot be empty");
 	} else if (pw1 !== pw2) {
 		alert("Passwords must match");
 	} else {

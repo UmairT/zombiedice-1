@@ -68,7 +68,7 @@
             </table>
         </div>
 
-	<button type="button" id="lobbyreturn">Return To Lobby</button>
+	<center><button type="button" id="lobbyreturn">Return To Lobby</button></center>
 
 	</container>
     
