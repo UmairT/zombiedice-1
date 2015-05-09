@@ -29,6 +29,7 @@ var	socketIO = require('socket.io'),
 var sess;
 var lobbyclients = [];
 var gameclients = [];
+var dicestats = {};
 
 console.log("Server is listening at http://localhost:3000/");
 
@@ -184,6 +185,83 @@ app.post("/userlogin", function (req,res) {
 	connectDB(login, userinfo, req, res);
 });
 
+
+////////////////rolling dice ///////////////////////
+function rollDice(){
+	dicestats.dice10 = "";
+	dicestats.dice20 = "";
+	dicestats.dice30 = "";
+
+	var options = ["brain", "brain", "feet", "feet", "shotgun", "shotgun"];
+	var dice1 = options[Math.floor((Math.random() * options.length))]; 
+	var dice2 = options[Math.floor((Math.random() * options.length))]; 
+	var dice3 = options[Math.floor((Math.random() * options.length))]; 
+
+	if(dice1 === "brain"){
+		dicestats.dice10 = "Brain";
+	}else if(dice1 === "feet"){
+		dicestats.dice10 = "Feet";
+	}
+	else
+	{
+		dicestats.dice10 = "Shotgun";
+	}
+
+	if(dice2 === "brain"){
+		dicestats.dice20 = "Brain";
+	}else if(dice2 === "feet"){
+		dicestats.dice20 = "Feet";
+	}
+	else
+	{
+		dicestats.dice20 = "Shotgun";
+	}
+
+	if(dice3 === "brain"){
+		dicestats.dice30 = "Brain";
+	}else if(dice3 === "feet"){
+		dicestats.dice30 = "Feet";
+	}
+	else
+	{
+		dicestats.dice30 = "Shotgun";
+	}
+
+}
+
+
+app.get('/rolldice', function(req, res){
+	console.log("Dice Rolling");
+	rollDice();
+	res.json(dicestats);
+});
+
+
+
+function checkDice(firstDice, secondDice, thirdDice) {
+	var array = [firstDice, secondDice, thirdDice];
+	var arraylen = array.length;
+	for(var i = 0; i < arraylen; i++){
+		if(array[i] === "Brain"){
+			array[i] = "<image src='images/brain_roll.png'>";
+		}
+		else if(array[i] === "Feet"){
+			array[i] = "<image src='images/foot_roll.png'>";
+		}
+		else
+		{
+			array[i] = "<image src='images/shotgun_roll.png'>";
+		}
+	}
+
+	return array;
+}
+
+///////////////////////////////////////////////////
+
+
+
+
 //lobby socket io interaction
 nspLobby.on('connection', function(socket) {
 	console.log(sess.username + ' connected to lobby');
@@ -249,12 +327,36 @@ nspGame.on ('connection', function(socket) {
 		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
 	});
 
-	socket.on('stop and score', function(sid) {
+
+	/////dice rolling code and stop button actions 
+	socket.on('diceroll', function(data){
+		console.log('dice json recieved');
+		var images = checkDice(data.dice10, data.dice20, data.dice30);
+		nspGame.emit('dicerollresult', data, images);
+	});
+
+	socket.on('stopOther', function(sid){
+		nspGame.connected[sid].emit('disable', sid);
+	});
+
+	socket.on('stopScore', function(sid) {
+		nspGame.connected[sid].emit('enable', sid);  //enables 2nd player
+		//disaples buttons for player waiting
+		//nspGame.connected[sid].emit("stop", socket.id, username, 1);
 		console.log("score saved");
 		var index = findIndex(gameclients, "sid", socket.id);
 		var username = gameclients[index].username;
-		nspGame.connected[sid].emit("stop", socket.id, username, 1);
+		//turn for next player
+		nspGame.emit('Player', sid, username);
+		
 	});
+
+	// socket.on('stop and score', function(sid) {
+	// 	console.log("score saved");
+	// 	var index = findIndex(gameclients, "sid", socket.id);
+	// 	var username = gameclients[index].username;
+	// 	nspGame.connected[sid].emit("stop", socket.id, username, 1);
+	// });
 	
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
