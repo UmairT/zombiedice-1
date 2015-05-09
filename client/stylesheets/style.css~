@@ -375,7 +375,8 @@ header, container {
 	display: none;
 }
 
-#available {	
+#available {
+	
 	width: 50%;
 	height: 500px;
 	border-style: solid;

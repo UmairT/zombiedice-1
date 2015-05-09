@@ -19,7 +19,6 @@
                 <form action="#" method="post" name="login" id="login_id" class="form_class" >
                     <!-- <label>Username  -->
                     <input type="text" name="username" id="username" placeholder="username" class="form-control"/>
-			<br>
                     <!-- <label>Password  -->
                     <input type="password" name="password" id="password" placeholder="password" class="form-control"/><br>
                     <input class="btn" type="button" name="login" id="btn_id" value="Login" onclick="login()"/>

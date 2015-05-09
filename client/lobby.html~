@@ -7,35 +7,27 @@
     </head>
     
     <body>
-        <center>
-        <div id="loginarea" class="login">
-        	<h1><image src='images/logo2.png'></image></h1><br><br>
-            <center><h2>Please login to play</h2></center>
-        	<div id="wrongunpw">
-        		<p>Wrong Username/Password</p>
-        	</div>
-            <!-- <p>Wrong Username/Password</p> -->
-            <form action="#" method="post" name="login" id="login_id" class="form_class" >
-                <!-- <label>Username -->
-                <input type="text" name="username" id="username" placeholder="username" class="form-control"/>
-                <!-- <label>Password  -->
-		<br>
-                <input type="password" name="password" id="password" placeholder="password" class="form-control"/><br>
-                <input class="btn" type="button" name="login" id="loginsubmit" value="Login" />
-                <a href="registration.html">Register</a>
-            </form>
-        </div>
-        </center>
-        <!-- </div> -->
-    
-        <div id="homepageimage">
-            <center><p>New to the game? Click 
-            <a href = "javascript:void(0)" 
-            onclick = "document.getElementById('light').style.display='block';
-                        document.getElementById('fade').style.display='block'"
-                        >here</a> for the rules</p></center>
+	<br><br>
+    <center><h1><image src='images/logo2.png'></image></h1></center>
+    	<br><br>
 
-            <div id="light" class="white_content">
+    <container>
+
+    <div id="userinfo">
+	<br><br>
+	<center><h2>Welcome <div id="username" ></div></h2></center>
+	<br>
+	<center><h3>Current Record</h3></center>
+	<center><h3>Wins: <div id="wins"></div>  Losses: <div id="losses"></div></h3></center>
+	<br>
+	<center><button type="button" class="btn" id="Logoff">Log Off</button></center>
+	<center><p>New to the game? Click 
+        <a href = "javascript:void(0)" 
+        onclick = "document.getElementById('light').style.display='block';
+                    document.getElementById('fade').style.display='block'"
+                    >here</a> for the rules</p></center>
+
+    <div id="light" class="white_content">
 
         <center><h2>Eat brains. Don’t get shotgunned.</h2></center>
 
@@ -87,14 +79,41 @@
             >Back</a>
         </center>
     </div>
+    </div>
     
+<div id="available">
+	<select id="onlineplayers" size=28></select>
+	<button id="btnChallenge">Challenge</button>
+	<!--<button id="testbutton">Test</button>-->
+</div>
 
-    <div id="fade" class="black_overlay"></div>
-    </div>
+<div id="challengepopup" class="popups">
+	<form action="#" id="form" method="post" name="form">
+		<h2>Your have been challenged by <div id="challenger">player</div></h2>
+		<input type="hidden" id="challengeid" value="">
+		<button type="button" class="formbutton" id="chAccept">Accept</button>
+		<button type="button" class="formbutton" id="chDecline">Decline</button><br>
+	<form>
+</div>
+
+<div id="waitingpopup" class="popups">
+	<form action="#" id="form" method="post" name="form">
+		<h2>Awaiting reply</h2>
+	<form>
+</div>
+
+<div id="declinedpopup" class="popups">
+	<form action="#" id="form" method="post" name="form">
+		<h2>Your challenge has been declined.</h2>
+		<button type="button" class="formbutton" id="btnDeclineClose">Close</button><br>
+	<form>
+</div>
+</container>
     
-    </div>
 
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-    <script src="javascripts/app.js"></script>
+    <script src="javascripts/lobby.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     </body>
     </html>
+

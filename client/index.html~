@@ -19,7 +19,6 @@
                 <!-- <label>Username -->
                 <input type="text" name="username" id="username" placeholder="username" class="form-control"/>
                 <!-- <label>Password  -->
-		<br>
                 <input type="password" name="password" id="password" placeholder="password" class="form-control"/><br>
                 <input class="btn" type="button" name="login" id="loginsubmit" value="Login" />
                 <a href="registration.html">Register</a>
