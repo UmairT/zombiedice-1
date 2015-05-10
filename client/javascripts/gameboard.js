@@ -4,8 +4,10 @@ var main = function() {
 	"use strict";
 	
 	//keeping track of players
-	var playersid,
-		currentsid;
+	var currentsid,
+		currplayer = "",
+		numberofbrains = 0,
+		numberofshotguns = 0;
 
 	socket = io('http://localhost:3000/ingame');
 
@@ -17,8 +19,6 @@ var main = function() {
 			//rollClicked(dicestats.dice10, dicestats.dice20, dicestats.dice30);
 			socket.emit('diceroll', dicestats);
 		});
-
-
 
 		///have currentsid 
 
@@ -50,6 +50,49 @@ var main = function() {
 
 	});
 
+
+    $("div.brains").text("Brains: 0");
+    $("div.shotguns").text("Shotguns: 0");
+
+    //counts the number of brains & shotguns to display
+	socket.on('countScore', function(data){
+		$("div.brains").html("");
+		$("div.shotguns").html("");
+
+		numberofshotguns = numberofshotguns + data.shotgun;
+		numberofbrains = numberofbrains + data.brain;
+
+		checkStats();
+
+		$("div.brains").text('Brains: ' + numberofbrains);
+		$("div.shotguns").text('Shotguns: ' + numberofshotguns);
+	});
+
+
+
+	//fucntion will check if brains == 13(5 for now) || shotguns == 3 
+	//end turn or keep rolling kk
+	function checkStats(){
+		if(numberofbrains >= 5){
+			///game won 
+			$("div.winner").text('Winner ' + currplayer);
+			socket.emit('winner', currentsid);
+			//socket.emit('stopScore', currentsid);
+		}
+		else if(numberofshotguns >= 3){
+			//game over reset numberofshotgun & number of brains
+			$("div.gameOver").text('Death by Shotgun: ' + currplayer);
+			numberofshotguns = 0;
+			numberofbrains = 0;
+			socket.emit('stopScore', currentsid);
+		}
+		else{
+			///nothing 
+		}
+	}
+
+
+
 	//Login
 	$("#lobbyreturn").click(function() {
 		$(location).attr('href', "/lobby");
@@ -68,9 +111,11 @@ var main = function() {
 	//zombie challenge human -> human turn 
 	socket.on('Player', function(sid, username){
 		currentsid = sid;  //got the sid of current player 
+		currplayer = username;
 		console.log('Currentsid ' + sid);
-		//console.log('socket ' + number);
 		console.log('Turn: ' + username);
+		$("div.playing").html("");
+		$("div.playing").text("Turn: " + username);
 		$("div.turn").html("");
 		$("div.turn").text("Turn: " + username);
 	});
@@ -91,10 +136,6 @@ var main = function() {
 		console.log('disabled buttons');
 	});
 
-
-    //$("div.turn").text("Turn: ");
-    $("div.brains").text("Brains: 1");
-    $("div.shotguns").text("Shotguns: 1");
 }
 
 $(document).ready(main);

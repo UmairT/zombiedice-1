@@ -236,9 +236,7 @@ app.get('/rolldice', function(req, res){
 	res.json(dicestats);
 });
 
-
-
-function checkDice(firstDice, secondDice, thirdDice) {
+function checkDice(firstDice, secondDice, thirdDice) {	
 	var array = [firstDice, secondDice, thirdDice];
 	var arraylen = array.length;
 	for(var i = 0; i < arraylen; i++){
@@ -255,6 +253,29 @@ function checkDice(firstDice, secondDice, thirdDice) {
 	}
 
 	return array;
+}
+
+function countDice(firstDice, secondDice, thirdDice){
+	var result = {};
+	result.shotgun = 0;
+	result.feet = 0;
+	result.brain = 0;
+
+	var myarry = [firstDice, secondDice, thirdDice];
+	var arrlen = myarry.length;
+	for(var i = 0; i < arrlen; i++){
+		if(myarry[i] === "Brain"){
+			result.brain++;
+		}
+		else if(myarry[i] === "Feet"){
+			result.feet++;
+		}
+		else{
+			result.shotgun++;
+		}
+	}
+
+	return result;
 }
 
 ///////////////////////////////////////////////////
@@ -364,7 +385,9 @@ nspGame.on ('connection', function(socket) {
 	socket.on('diceroll', function(data){
 		console.log('dice json recieved');
 		var images = checkDice(data.dice10, data.dice20, data.dice30);
+		var numberofresult = countDice(data.dice10, data.dice20, data.dice30);
 		nspGame.emit('dicerollresult', data, images);
+		nspGame.emit('countScore', numberofresult);
 	});
 
 
@@ -386,16 +409,27 @@ nspGame.on ('connection', function(socket) {
 			nspGame.connected[human].emit('disable'); 
 		}
 
-		//if(sid === human)
-
 		nspGame.emit('Player', sid, username);
 		nspGame.connected[sid].emit('enable');
 		console.log("Current Player " + sid);
 	});
 
+	socket.on('winner', function(sid){
+		nspGame.connected[sid].emit('disable');
+
+	});
+
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
 	});
+
+	// socket.on('gamestats' function(sid){
+
+	// });
+
+
+
+
 });
 
 
