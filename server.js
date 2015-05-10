@@ -397,3 +397,7 @@ nspGame.on ('connection', function(socket) {
 		console.log('someone disconnected');
 	});
 });
+
+
+//////////////////////////GamePlay //////////////////////////////////
+
