@@ -18,6 +18,10 @@ var main = function() {
 			socket.emit('diceroll', dicestats);
 		});
 
+
+
+		///have currentsid 
+
 	});
 
 	//plan to give other player the turn and freeze buttons not working 
@@ -73,7 +77,7 @@ var main = function() {
 
 
 	//enable buttons for player who is waiting for his turn
-	socket.on('enable', function(sid) {
+	socket.on('enable', function() {
 		document.getElementById('roll').disabled = false;
 		document.getElementById('stop').disabled = false;
 		console.log('enable buttons');
