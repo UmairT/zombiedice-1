@@ -85,7 +85,7 @@ var main = function() {
 	//fucntion will check if brains == 13(5 for now) || shotguns == 3 
 	//end turn or keep rolling kk
 	function checkStats(){
-		if(numberofbrains >= 5){
+		if(numberofbrains >= 13){
 			///game won 
 			$("div.winner").text("Winner: " + currplayer);
 			$("div.gameOver").text("Game Over");
