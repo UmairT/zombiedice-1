@@ -338,7 +338,7 @@ nspGame.on ('connection', function(socket) {
 		console.log('socket.id ' + socket.id);
 
 		//console.log('human' + human);
-		nspGame.connected[human].emit('disable', socket.id);
+		nspGame.connected[human].emit('disable');
 	}
 	
 
@@ -378,17 +378,17 @@ nspGame.on ('connection', function(socket) {
 			//console.log('disable zombie player');
 			sid = human;
 			username = humanname;
-			//nspGame.connected[zombie].emit('disable', zombiesocket);  //disable prev player
+			nspGame.connected[zombie].emit('disable');  //disable prev player
 		}
 		else if(sid === human){
 			console.log('disable human player');
 			sid = zombie;
 			username = zombiename;
-			//nspGame.connected[human].emit('disable', humansocket); 
+			nspGame.connected[human].emit('disable'); 
 		}
 
 		nspGame.emit('Player', sid, username);
-		//nspGame.connected[sid].emit('enable', tempsocket);
+		nspGame.connected[sid].emit('enable');
 		console.log("Current Player " + sid);
 		
 		//nspGame.connected[human].emit('enable', humansocket);  //enables next player

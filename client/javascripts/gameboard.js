@@ -81,7 +81,7 @@ var main = function() {
 
 
 	//disable buttons for player who is waiting for his turn
-	socket.on('disable', function(sid) {
+	socket.on('disable', function() {
 		document.getElementById('roll').disabled = true;
 		document.getElementById('stop').disabled = true;
 		console.log('disabled buttons');
