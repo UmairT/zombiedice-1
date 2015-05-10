@@ -30,6 +30,7 @@ var sess;
 var lobbyclients = [];
 var gameclients = [];
 var dicestats = {};
+var ran = 0;  //track of run times
 
 console.log("Server is listening at http://localhost:3000/");
 
@@ -117,7 +118,49 @@ var record = function(collection, obj, req, res) {
 	});
 };
 
+//increment wins or looses
+function increaseGame(collection, gameusername){
+	collection.findOne({username: gameusername}, function(err, item) {
+		if(!err) {
+			collection.update({username: gameusername}, {$inc: {wins: 1}});
+			console.log("Game Stats Updated " + gameusername);
+		}	
+	});
+}
+
+function decreseGame(collection, gameusername){
+	collection.findOne({username: gameusername}, function(err, item) {
+		if(!err) {
+			collection.update({username: gameusername}, {$inc: {losses: 1}});
+			console.log("Game Stats Updated " + gameusername);
+		}	
+	});
+}
+
 //routing
+app.post("/updategamestats", function(req, res){
+	var temp = req.body;
+	var sendname = "";
+	var sendloss = "";
+	console.log("Transfered: " + temp.sid);
+	if(temp.sid === zombie){
+		sendname = zombiename;
+		sendloss = humanname;
+	}
+	else{
+		sendname = humanname;
+		sendloss = zombiename;
+	}
+
+	console.log("Updating: " + sendname);
+
+	//update winner by 1 & looses by 1 
+	connectDB(increaseGame, sendname, req, res);
+	connectDB(decreseGame, sendloss, req, res);
+
+});
+
+
 app.get("/",function(req,res){
 	console.log("inside /");
 	sess=req.session;
@@ -184,6 +227,7 @@ app.post("/userlogin", function (req,res) {
 	var userinfo = req.body;
 	connectDB(login, userinfo, req, res);
 });
+
 
 
 ////////////////rolling dice ///////////////////////
@@ -430,9 +474,16 @@ nspGame.on ('connection', function(socket) {
 		console.log("Current brains " + sendbrains);
 	});
 
-	socket.on('winner', function(sid){
-		nspGame.connected[sid].emit('disable');
 
+	socket.on('winner', function(sid){
+		//var sendname;
+		zombiebrains = 0;
+		humanbrains = 0;
+		//need to make a looser update
+		//run twice 
+		nspGame.connected[sid].emit('disable');
+		nspGame.connected[sid].emit('winnerUpdate', ran);
+		ran++;
 	});
 
 	socket.on('clearBoard', function(){
@@ -441,6 +492,7 @@ nspGame.on ('connection', function(socket) {
 
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
+		ran = 0; //resets winner runtime count 
 	});
 
 	// socket.on('gamestats', function(sid){
@@ -451,3 +503,7 @@ nspGame.on ('connection', function(socket) {
 
 //////////////////////////GamePlay //////////////////////////////////
 
+// app.get('/getrecord', function(req, res) {
+// 	sess=req.session;
+// 	connectDB(record, sess, req, res);
+// });

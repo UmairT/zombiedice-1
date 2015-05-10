@@ -5,6 +5,7 @@ var main = function() {
 	
 	//keeping track of players
 	var currentsid,
+		sendstring,
 		currplayer = "",
 		numberofbrains = 0,
 		numberofshotguns = 0;
@@ -90,23 +91,45 @@ var main = function() {
 	function checkStats(){
 		if(numberofbrains >= 5){
 			///game won 
-			$("div.winner").text('Winner ' + currplayer);
+			$("div.winner").text('Winner: ' + currplayer);
+			$("div.gameOver").text('Game Over');
+
+			//runs twice 
 			socket.emit('winner', currentsid);
+
+			console.log("Sending ID: " + currentsid);
+			console.log("Sending name: " + currplayer);
+
 			//socket.emit('stopScore', currentsid);
 			//add winner to game stats pass winner 
 		}
 		else if(numberofshotguns >= 3){
 			//game over reset numberofshotgun & number of brains
 			$("div.gameOver").text('Death by Shotgun: ' + currplayer);
-
 			//clear emit
 			socket.emit('clearBoard');
+			numberofbrains = 0;
+			socket.emit('TrackScore', currentsid, numberofbrains);  //reset back to zero
 			socket.emit('stopScore', currentsid);
 		}
 		else{
 			///nothing 
 		}
 	}
+
+	//ran emit runs twice this makes it run once 
+	socket.on('winnerUpdate', function(ran) {
+		//console.log("Running winnerUpdate");
+
+		if(ran === 0)
+		{
+			var useridinfo = {"sid": currentsid};
+			$.post("/updategamestats", useridinfo, function(response) {
+				console.log("send sid");
+			});
+		}
+
+	});
 
 
 
