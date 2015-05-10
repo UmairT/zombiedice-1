@@ -1,55 +1,51 @@
+// Client-side code
+/* jshint browser: true, jquery: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, strict: true, undef: true, unused: true */
 var socket;
 
 var main = function() {
 	"use strict";
 	
-	//keeping track of players
+	//keeping track of current player
 	var currentsid,
-		sendstring,
 		currplayer = "",
 		numberofbrains = 0,
 		numberofshotguns = 0;
 
-	socket = io('http://localhost:3000/ingame');
+	socket = io("http://localhost:3000/ingame");
 
 	//roll event gets json of dice roll and emits to both players the results
-	$('#roll').click(function(){
-		console.log('roll click works');
-		$.getJSON('/rolldice', function(dicestats){
-			//console.log('Brains ' + dicestats.dice10);
-			//rollClicked(dicestats.dice10, dicestats.dice20, dicestats.dice30);
-			socket.emit('diceroll', dicestats);
+	$("#roll").click(function(){
+		console.log("roll click works");
+		$.getJSON("/rolldice", function(dicestats){
+			socket.emit("diceroll", dicestats);
 		});
-
-		///have currentsid 
 
 	});
 
 	//plan to give other player the turn and freeze buttons not working 
-	$('#stop').click(function(){
+	$("#stop").click(function(){
 		//add up the brains 
 		//event to clear stats
 
-		socket.emit('TrackScore', currentsid, numberofbrains);
-		socket.emit('clearBoard');
-		socket.emit('stopScore', currentsid);
+		socket.emit("TrackScore", currentsid, numberofbrains);
+		socket.emit("clearBoard");
+		socket.emit("stopScore", currentsid);
 	
 		
 	});
 
-
-	socket.on('resetStats', function() {
+	socket.on("resetStats", function() {
 		numberofbrains = 0;
 		numberofshotguns = 0;
 		$("div.brains").html("");
 		$("div.brains").text("Brains: " + numberofbrains);
 		$("div.shotguns").html("");
-		$("div.shotguns").text('Shotguns: ' + numberofshotguns);
+		$("div.shotguns").text("Shotguns: " + numberofshotguns);
 	});
 
 	//appends dice results to gameboard for both players
-	socket.on('dicerollresult', function(dices, images) {
-		console.log('data results received');
+	socket.on("dicerollresult", function(dices, images) {
+		console.log("data results received");
 		$("div.dice1").text("Rolling...");
 	    $("div.dice2").text("Rolling...");
 	    $("div.dice3").text("Rolling...");
@@ -71,7 +67,7 @@ var main = function() {
     $("div.shotguns").text("Shotguns: 0");
 
     //counts the number of brains & shotguns to display
-	socket.on('countScore', function(data){
+	socket.on("countScore", function(data){
 		$("div.brains").html("");
 		$("div.shotguns").html("");
 
@@ -80,8 +76,8 @@ var main = function() {
 
 		checkStats();
 
-		$("div.brains").text('Brains: ' + numberofbrains);
-		$("div.shotguns").text('Shotguns: ' + numberofshotguns);
+		$("div.brains").text("Brains: " + numberofbrains);
+		$("div.shotguns").text("Shotguns: " + numberofshotguns);
 	});
 
 
@@ -91,26 +87,26 @@ var main = function() {
 	function checkStats(){
 		if(numberofbrains >= 5){
 			///game won 
-			$("div.winner").text('Winner: ' + currplayer);
-			$("div.gameOver").text('Game Over');
+			$("div.winner").text("Winner: " + currplayer);
+			$("div.gameOver").text("Game Over");
 
 			//runs twice 
-			socket.emit('winner', currentsid);
+			socket.emit("winner", currentsid);
 
 			console.log("Sending ID: " + currentsid);
 			console.log("Sending name: " + currplayer);
 
-			//socket.emit('stopScore', currentsid);
+			//socket.emit("stopScore", currentsid);
 			//add winner to game stats pass winner 
 		}
 		else if(numberofshotguns >= 3){
 			//game over reset numberofshotgun & number of brains
-			$("div.gameOver").text('Death by Shotgun: ' + currplayer);
+			$("div.gameOver").text("Death by Shotgun: " + currplayer);
 			//clear emit
-			socket.emit('clearBoard');
+			socket.emit("clearBoard");
 			numberofbrains = 0;
-			socket.emit('TrackScore', currentsid, numberofbrains);  //reset back to zero
-			socket.emit('stopScore', currentsid);
+			socket.emit("TrackScore", currentsid, numberofbrains);  //reset back to zero
+			socket.emit("stopScore", currentsid);
 		}
 		else{
 			///nothing 
@@ -118,27 +114,24 @@ var main = function() {
 	}
 
 	//ran emit runs twice this makes it run once 
-	socket.on('winnerUpdate', function(ran) {
-		//console.log("Running winnerUpdate");
-
+	socket.on("winnerUpdate", function(ran) {
 		if(ran === 0)
 		{
 			var useridinfo = {"sid": currentsid};
-			$.post("/updategamestats", useridinfo, function(response) {
+			$.post("/updategamestats", useridinfo, function() {
 				console.log("send sid");
 			});
 		}
-
 	});
 
 
 
 	//Login
 	$("#lobbyreturn").click(function() {
-		$(location).attr('href', "/lobby");
+		$(location).attr("href", "/lobby");
 	});
 
-	socket.on('handshake', function(sid, username, ret) {
+	socket.on("handshake", function(sid, username, ret) {
 		console.log("handshake received from " + sid);
 		$("#opponentid").val(sid);
 		$("#opponentname").empty();
@@ -149,13 +142,13 @@ var main = function() {
 	});
 
 	//zombie challenge human -> human turn 
-	socket.on('Player', function(sid, username, numbrains){
+	socket.on("Player", function(sid, username, numbrains){
 		currentsid = sid;  //got the sid of current player 
 		currplayer = username;
 		numberofbrains = numbrains;
-		console.log('Currentsid ' + sid);
-		console.log('Turn: ' + username);
-		console.log('numbrains' + numbrains);
+		console.log("Currentsid " + sid);
+		console.log("Turn: " + username);
+		console.log("numbrains" + numbrains);
 		$("div.brains").html("");
 		$("div.brains").text("Brains: " + numberofbrains);
 
@@ -168,20 +161,20 @@ var main = function() {
 
 
 	//enable buttons for player who is waiting for his turn
-	socket.on('enable', function() {
-		document.getElementById('roll').disabled = false;
-		document.getElementById('stop').disabled = false;
-		console.log('enable buttons');
+	socket.on("enable", function() {
+		document.getElementById("roll").disabled = false;
+		document.getElementById("stop").disabled = false;
+		console.log("enable buttons");
 	});
 
 
 	//disable buttons for player who is waiting for his turn
-	socket.on('disable', function() {
-		document.getElementById('roll').disabled = true;
-		document.getElementById('stop').disabled = true;
-		console.log('disabled buttons');
+	socket.on("disable", function() {
+		document.getElementById("roll").disabled = true;
+		document.getElementById("stop").disabled = true;
+		console.log("disabled buttons");
 	});
 
-}
+};
 
 $(document).ready(main);
