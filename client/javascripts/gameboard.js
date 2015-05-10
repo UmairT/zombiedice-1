@@ -23,8 +23,8 @@ var main = function() {
 	//plan to give other player the turn and freeze buttons not working 
 	$('#stop').click(function(){
 		//add up the brains 
-		socket.emit('stopScore', playersid);
-		socket.emit('stopOther', currentsid);
+		socket.emit('stopScore', currentsid);
+		//socket.emit('stopOther', currentsid);
 	});
 
 	
@@ -65,6 +65,7 @@ var main = function() {
 	//zombie challenge human -> human turn 
 	socket.on('Player', function(sid, username){
 		currentsid = sid;  //got the sid of current player 
+		console.log('Currentsid' + sid);
 		$("div.turn").text("Turn: " + username);
 	});
 
@@ -73,7 +74,7 @@ var main = function() {
 	socket.on('enable', function(sid) {
 		document.getElementById('roll').disabled = false;
 		document.getElementById('stop').disabled = false;
-		console.log('enable buttons ');
+		console.log('enable buttons');
 	});
 
 

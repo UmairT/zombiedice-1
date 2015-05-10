@@ -260,7 +260,12 @@ function checkDice(firstDice, secondDice, thirdDice) {
 ///////////////////////////////////////////////////
 
 
-var human;
+var human,
+	humansocket,
+	humanname,
+	zombie,
+	zombiesocket,
+	zombiename;
 
 //lobby socket io interaction
 nspLobby.on('connection', function(socket) {
@@ -298,12 +303,14 @@ nspLobby.on('connection', function(socket) {
 	});
 });
 
+
+//human p2
+//zombie p1
 //game io interaction
 nspGame.on ('connection', function(socket) {
 	console.log(sess.username + ' joined game');
 	var p1Brains = 0,
 		p2Brains = 0,
-		zombie,
 		dice1, dice2, dice3;
 	
 	//add new user to clients
@@ -323,8 +330,11 @@ nspGame.on ('connection', function(socket) {
 		//testing is the person that was challenged? zombie challenge human -> opponentid is human!
 		nspGame.emit('Player', socket.id, username);
 		console.log('opponentid ' + opponentid);
-		nspGame.connected[opponentid].emit('disable', socket.id);
-
+		human = opponentid;
+		humanname = username;
+		humansocket = socket.id;
+		//console.log('human' + human);
+		nspGame.connected[human].emit('disable', socket.id);
 	}
 	
 
@@ -333,7 +343,7 @@ nspGame.on ('connection', function(socket) {
 	socket.on('return handshake', function(sid) {
 		//testing for disable  zombie hmmmm
 		//nspGame.connected[human].emit('disable', sid);  
-		zombie = sid;
+;
 
 		console.log('Human ' + human);
 		console.log('Zombie ' + zombie);
@@ -341,7 +351,9 @@ nspGame.on ('connection', function(socket) {
 		var index = findIndex(gameclients, "sid", socket.id);
 		var username = gameclients[index].username;
 		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
-
+		zombie = sid;
+		zombiesocket = socket.id;
+		zombiename = username;
 		///testing challenge player goes first
 		//nspGame.emit('Player', sid, username);
 		//nspGame.connected[sid].emit('Player', sid, username);
@@ -361,14 +373,36 @@ nspGame.on ('connection', function(socket) {
 	});
 
 	socket.on('stopScore', function(sid) {
-		nspGame.connected[sid].emit('enable', sid);  //enables 2nd player
+
+		console.log("sid when stopScore " + sid);
+		var username;
+		//check for turns 
+		if(sid === zombie){
+			console.log('disable zombie player');
+			sid = human;
+			tempsocket = humansocket;
+			username = humanname;
+			nspGame.connected[zombie].emit('disable', zombiesocket);  //disable prev player
+		}
+		else if(sid === human){
+			console.log('disable human player');
+			sid = zombie;
+			tempsocket = zombiesocket;
+			username = zombiename;
+			nspGame.connected[human].emit('disable', humansocket); 
+		}
+
+		nspGame.connected[sid].emit('enable', tempsocket);
+		console.log("enable " + sid);
+		nspGame.emit('Player', sid, username);
+		//nspGame.connected[human].emit('enable', humansocket);  //enables next player
 		//disaples buttons for player waiting
 		//nspGame.connected[sid].emit("stop", socket.id, username, 1);
-		console.log("score saved");
-		var index = findIndex(gameclients, "sid", socket.id);
-		var username = gameclients[index].username;
+		// console.log("score saved");
+		//var index = findIndex(gameclients, "sid", socket.id);
+		//var username = gameclients[index].username;
 		//turn for next player
-		nspGame.emit('Player', sid, username);
+	
 		
 	});
 
