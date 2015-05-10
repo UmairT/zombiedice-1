@@ -24,7 +24,6 @@ var main = function() {
 	$('#stop').click(function(){
 		//add up the brains 
 		socket.emit('stopScore', currentsid);
-		//socket.emit('stopOther', currentsid);
 	});
 
 	
@@ -63,9 +62,12 @@ var main = function() {
 	});
 
 	//zombie challenge human -> human turn 
-	socket.on('Player', function(sid, username){
+	socket.on('Player', function(sid, number, username){
 		currentsid = sid;  //got the sid of current player 
-		console.log('Currentsid' + sid);
+		console.log('Currentsid ' + sid);
+		console.log('socket ' + number);
+		console.log('Turn: ' + username);
+		$("div.turn").html("");
 		$("div.turn").text("Turn: " + username);
 	});
 
