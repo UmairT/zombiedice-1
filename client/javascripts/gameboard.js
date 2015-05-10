@@ -27,10 +27,25 @@ var main = function() {
 	//plan to give other player the turn and freeze buttons not working 
 	$('#stop').click(function(){
 		//add up the brains 
+		//event to clear stats
+
+		socket.emit('TrackScore', currentsid, numberofbrains);
+		socket.emit('clearBoard');
 		socket.emit('stopScore', currentsid);
+	
+		
 	});
 
-	
+
+	socket.on('resetStats', function() {
+		numberofbrains = 0;
+		numberofshotguns = 0;
+		$("div.brains").html("");
+		$("div.brains").text("Brains: " + numberofbrains);
+		$("div.shotguns").html("");
+		$("div.shotguns").text('Shotguns: ' + numberofshotguns);
+	});
+
 	//appends dice results to gameboard for both players
 	socket.on('dicerollresult', function(dices, images) {
 		console.log('data results received');
@@ -78,12 +93,14 @@ var main = function() {
 			$("div.winner").text('Winner ' + currplayer);
 			socket.emit('winner', currentsid);
 			//socket.emit('stopScore', currentsid);
+			//add winner to game stats pass winner 
 		}
 		else if(numberofshotguns >= 3){
 			//game over reset numberofshotgun & number of brains
 			$("div.gameOver").text('Death by Shotgun: ' + currplayer);
-			numberofshotguns = 0;
-			numberofbrains = 0;
+
+			//clear emit
+			socket.emit('clearBoard');
 			socket.emit('stopScore', currentsid);
 		}
 		else{
@@ -109,13 +126,19 @@ var main = function() {
 	});
 
 	//zombie challenge human -> human turn 
-	socket.on('Player', function(sid, username){
+	socket.on('Player', function(sid, username, numbrains){
 		currentsid = sid;  //got the sid of current player 
 		currplayer = username;
+		numberofbrains = numbrains;
 		console.log('Currentsid ' + sid);
 		console.log('Turn: ' + username);
+		console.log('numbrains' + numbrains);
+		$("div.brains").html("");
+		$("div.brains").text("Brains: " + numberofbrains);
+
 		$("div.playing").html("");
-		$("div.playing").text("Turn: " + username);
+		$("div.playing").text("Playing: " + username);
+
 		$("div.turn").html("");
 		$("div.turn").text("Turn: " + username);
 	});

@@ -283,8 +283,10 @@ function countDice(firstDice, secondDice, thirdDice){
 
 var human,
 	humanname,
+	humanbrains = 0,
 	zombie,
-	zombiename;
+	zombiename,
+	zombiebrains = 0;
 
 //lobby socket io interaction
 nspLobby.on('connection', function(socket) {
@@ -353,7 +355,7 @@ nspGame.on ('connection', function(socket) {
 		//testing is the person that was challenged? zombie challenge human -> opponentid is human!
 		
 		//nspGame.emit('Player', opponentid, socket.id, username);
-		nspGame.emit('Player', socket.id, username);
+		nspGame.emit('Player', socket.id, username, 0);
 		console.log('opponentid ' + opponentid);
 		console.log('socket.id ' + socket.id);
 
@@ -390,28 +392,42 @@ nspGame.on ('connection', function(socket) {
 		nspGame.emit('countScore', numberofresult);
 	});
 
+	//track of how many brains when player presses stop
+	socket.on('TrackScore', function(sid, numberofbrains){
+		if(sid === zombie){
+			zombiebrains = numberofbrains;
+		}
+		else{
+			humanbrains = numberofbrains;
+		}
+	});
+
 
 	socket.on('stopScore', function(sid) {
 		console.log("sid when stopScore " + sid);
-		var username;
+		var username, 
+			sendbrains = 0;
 
 		//check for turns 
 		if(sid === zombie){
 			console.log('disable zombie player');
 			sid = human;
 			username = humanname;
+			sendbrains = humanbrains;
 			nspGame.connected[zombie].emit('disable');  //disable prev player
 		}
 		else {
 			console.log('disable human player');
 			sid = zombie;
 			username = zombiename;
+			sendbrains = zombiebrains;
 			nspGame.connected[human].emit('disable'); 
 		}
 
-		nspGame.emit('Player', sid, username);
+		nspGame.emit('Player', sid, username, sendbrains);
 		nspGame.connected[sid].emit('enable');
 		console.log("Current Player " + sid);
+		console.log("Current brains " + sendbrains);
 	});
 
 	socket.on('winner', function(sid){
@@ -419,17 +435,17 @@ nspGame.on ('connection', function(socket) {
 
 	});
 
+	socket.on('clearBoard', function(){
+		nspGame.emit('resetStats');
+	});
+
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
 	});
 
-	// socket.on('gamestats' function(sid){
-
+	// socket.on('gamestats', function(sid){
+		//check who won by parameter then add win & loss to the ppls account
 	// });
-
-
-
-
 });
 
 
