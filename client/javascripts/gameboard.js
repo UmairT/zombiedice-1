@@ -62,10 +62,10 @@ var main = function() {
 	});
 
 	//zombie challenge human -> human turn 
-	socket.on('Player', function(sid, number, username){
+	socket.on('Player', function(sid, username){
 		currentsid = sid;  //got the sid of current player 
 		console.log('Currentsid ' + sid);
-		console.log('socket ' + number);
+		//console.log('socket ' + number);
 		console.log('Turn: ' + username);
 		$("div.turn").html("");
 		$("div.turn").text("Turn: " + username);

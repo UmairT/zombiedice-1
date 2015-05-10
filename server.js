@@ -261,10 +261,8 @@ function checkDice(firstDice, secondDice, thirdDice) {
 
 
 var human,
-	humansocket,
 	humanname,
 	zombie,
-	zombiesocket,
 	zombiename;
 
 //lobby socket io interaction
@@ -290,7 +288,6 @@ nspLobby.on('connection', function(socket) {
 	
 	//send challenge request
 	socket.on('challenge', function(sid) {
-		human = sid;
 		console.log("recieved challenge for " + sid);
 		var index = findIndex(lobbyclients, "sid", socket.id);
 		nspLobby.connected[sid].emit("challenge recieved", lobbyclients[index].username, socket.id);
@@ -327,13 +324,19 @@ nspGame.on ('connection', function(socket) {
 		var username = sess.username;
 		nspGame.connected[opponentid].emit('handshake', socket.id, username, 0);
 
+
+
+		human = opponentid;
+		zombie = socket.id;
+		zombiename = username;
+
 		//testing is the person that was challenged? zombie challenge human -> opponentid is human!
 		
-		nspGame.emit('Player', opponentid, socket.id, username);
+		//nspGame.emit('Player', opponentid, socket.id, username);
+		nspGame.emit('Player', socket.id, username);
 		console.log('opponentid ' + opponentid);
-		human = opponentid;
-		humanname = username;
-		humansocket = socket.id;
+		console.log('socket.id ' + socket.id);
+
 		//console.log('human' + human);
 		nspGame.connected[human].emit('disable', socket.id);
 	}
@@ -342,22 +345,19 @@ nspGame.on ('connection', function(socket) {
 
 	///changed the bottom half of this functions
 	socket.on('return handshake', function(sid) {
-		//testing for disable  zombie hmmmm
-		//nspGame.connected[human].emit('disable', sid);  
-
-		console.log('Human ' + human);
-		console.log('Zombie ' + zombie);
 		console.log("handshake returned");
 		var index = findIndex(gameclients, "sid", socket.id);
 		var username = gameclients[index].username;
 		nspGame.connected[sid].emit("handshake", socket.id, username, 1);
-		zombie = sid;
-		zombiesocket = socket.id;
-		zombiename = username;
-		///testing challenge player goes first
-		//nspGame.emit('Player', sid, username);
-		//nspGame.connected[sid].emit('Player', sid, username);
-		//nspGame.connected[sid].emit('disable', sid);
+
+		//zombie = sid;
+		//zombiename = username;
+		humanname = username;
+
+		console.log('Human ' + human);
+		console.log('humanname ' + humanname);
+		console.log('Zombie ' + zombie);
+		console.log('zombiename ' + zombiename);
 	});
 
 
@@ -370,29 +370,26 @@ nspGame.on ('connection', function(socket) {
 
 
 	socket.on('stopScore', function(sid) {
-
 		console.log("sid when stopScore " + sid);
-		var username,
-			tempsocket;
+		var username;
+
 		//check for turns 
 		if(sid === zombie){
-			console.log('disable zombie player');
+			//console.log('disable zombie player');
 			sid = human;
-			tempsocket = humansocket;
 			username = humanname;
-			nspGame.connected[zombie].emit('disable', zombiesocket);  //disable prev player
+			//nspGame.connected[zombie].emit('disable', zombiesocket);  //disable prev player
 		}
 		else if(sid === human){
 			console.log('disable human player');
 			sid = zombie;
-			tempsocket = zombiesocket;
 			username = zombiename;
-			nspGame.connected[human].emit('disable', humansocket); 
+			//nspGame.connected[human].emit('disable', humansocket); 
 		}
 
-		nspGame.emit('Player', sid, tempsocket, username);
-		nspGame.connected[sid].emit('enable', tempsocket);
-		console.log("enable " + sid);
+		nspGame.emit('Player', sid, username);
+		//nspGame.connected[sid].emit('enable', tempsocket);
+		console.log("Current Player " + sid);
 		
 		//nspGame.connected[human].emit('enable', humansocket);  //enables next player
 		//disaples buttons for player waiting
@@ -403,13 +400,6 @@ nspGame.on ('connection', function(socket) {
 		//turn for next player
 	});
 
-	// socket.on('stop and score', function(sid) {
-	// 	console.log("score saved");
-	// 	var index = findIndex(gameclients, "sid", socket.id);
-	// 	var username = gameclients[index].username;
-	// 	nspGame.connected[sid].emit("stop", socket.id, username, 1);
-	// });
-	
 	socket.on('disconnect', function () {
 		console.log('someone disconnected');
 	});
